@@ -1,0 +1,26 @@
+# CRIAÇÃO DA REDE
+docker network create rede-docker
+
+# CRIAÇÃO DO VOLUME
+docker volume create mysql-dados
+
+# CRIAÇÃO DO CONTAINER MYSQL
+docker run -d --name mysql-db --network rede-docker --memory=128m --cpus=0.2 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=projeto_db -v mysql-dados:/var/lib/mysql mysql:latest
+
+# IMPORTAÇÃO DO BANCO DE DADOS
+Get-Content .\banco\banco.sql | docker exec -i mysql-db mysql -uroot -p123456
+
+# CONSTRUÇÃO DA IMAGEM NODE
+docker build -t lanchonete-node ./app
+
+# CRIAÇÃO DO CONTAINER NODE
+docker run -d --name node-app --network rede-docker --memory=128m --cpus=0.2 -p 3000:3000 lanchonete-node
+
+# VERIFICAR OS CONTAINERS
+docker ps
+
+# TESTAR CATEGORIAS
+curl.exe http://localhost:3000/categorias
+
+# TESTAR PRODUTOS
+curl.exe http://localhost:3000/produtos
